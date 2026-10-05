@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Join team · Dragon Boat Runner</title>
+<link rel="icon" href="/logo.png">
+<style>
+  :root { --red:#b91c1c; --gold:#f2b33d; --water:#0f2a3d; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+         background: linear-gradient(160deg,var(--water),#1d4e6b 60%,var(--red)); color:#fff;
+         display:flex; align-items:center; justify-content:center; padding:16px; }
+  main { width:100%; max-width:420px; text-align:center; }
+  img { width:130px; height:130px; border-radius:28px; box-shadow:0 10px 30px #0006; }
+  h1 { margin:18px 0 6px; font-size:26px; }
+  p { opacity:.85; line-height:1.45; margin:6px 0; }
+  .code { font-size:40px; font-weight:900; letter-spacing:8px; background:#fff1; border:2px dashed #fff6;
+          border-radius:14px; padding:12px; margin:18px 0 8px; }
+  .btn { display:block; width:100%; padding:15px; margin:10px 0; border-radius:14px; border:0;
+         font-size:17px; font-weight:700; text-decoration:none; cursor:pointer; }
+  .primary { background:var(--gold); color:#2b1600; }
+  .ghost { background:#fff1; color:#fff; border:1px solid #fff5; }
+  .small { font-size:13px; opacity:.75; margin-top:16px; }
+</style>
+</head>
+<body>
+<main>
+  <img src="/logo.png" alt="Dragon Boat Runner">
+  <h1 id="title">Join your team</h1>
+  <p id="intro">You were invited to a team in Dragon Boat Runner.</p>
+  <div class="code" id="code">——</div>
+  <a class="btn primary" id="open" href="#">Open in the app</a>
+  <a class="btn ghost" id="store" href="#">Install the app</a>
+  <button class="btn ghost" id="copy" type="button">Copy code</button>
+  <p class="small" id="hint">New here? Install the app, sign in and enter the code under “Join team”.</p>
+</main>
+<script>
+  // ---- configuration (keep in sync with lib/config.dart) ----
+  const CONFIG = {
+    scheme: 'dragonboatrunner',
+    androidPackage: 'de.dragonboatrunner.dragon_boat_runner',
+    playStore: 'https://play.google.com/store/apps/details?id=de.dragonboatrunner.dragon_boat_runner',
+    appStore: 'https://apps.apple.com/app/id0000000000'
+  };
+
+  const m = location.pathname.match(/\/join\/([A-Za-z0-9]+)/);
+  const code = ((m && m[1]) || new URLSearchParams(location.search).get('code') || '')
+                 .toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const ua = navigator.userAgent;
+  const isAndroid = /Android/i.test(ua);
+  const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const de = (navigator.language || '').toLowerCase().startsWith('de');
+
+  const T = de ? {
+    title: 'Tritt deinem Team bei', intro: 'Du wurdest in ein Team der App Dragon Boat Runner eingeladen.',
+    open: 'In der App öffnen', store: 'App installieren', copy: 'Code kopieren', copied: 'Kopiert ✓',
+    hint: 'Neu hier? App installieren, anmelden und den Code unter „Team beitreten“ eingeben.'
+  } : {
+    title: 'Join your team', intro: 'You were invited to a team in Dragon Boat Runner.',
+    open: 'Open in the app', store: 'Install the app', copy: 'Copy code', copied: 'Copied ✓',
+    hint: 'New here? Install the app, sign in and enter the code under “Join team”.'
+  };
+  document.documentElement.lang = de ? 'de' : 'en';
+  for (const k of ['title', 'intro', 'hint']) document.getElementById(k).textContent = T[k];
+  document.getElementById('code').textContent = code || '——';
+
+  const storeUrl = isIOS ? CONFIG.appStore : CONFIG.playStore;
+  const openBtn = document.getElementById('open');
+  const storeBtn = document.getElementById('store');
+  const copyBtn = document.getElementById('copy');
+  openBtn.textContent = T.open; storeBtn.textContent = T.store; copyBtn.textContent = T.copy;
+  storeBtn.href = storeUrl;
+
+  const appUrl = `${CONFIG.scheme}://join?code=${code}`;
+  openBtn.href = isAndroid
+    ? `intent://join?code=${code}#Intent;scheme=${CONFIG.scheme};package=${CONFIG.androidPackage};S.browser_fallback_url=${encodeURIComponent(CONFIG.playStore)};end`
+    : appUrl;
+
+  async function copyCode() {
+    try { await navigator.clipboard.writeText(code); copyBtn.textContent = T.copied; } catch (e) {}
+  }
+  copyBtn.addEventListener('click', copyCode);
+  openBtn.addEventListener('click', () => {
+    copyCode(); // so the code can be pasted after installing
+    if (isIOS) {
+      setTimeout(() => { if (!document.hidden) location.href = CONFIG.appStore; }, 1600);
+    }
+  });
+</script>
+</body>
+</html>

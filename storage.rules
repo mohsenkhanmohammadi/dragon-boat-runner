@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isImage() {
+      return request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // profile photos
+    match /users/{userId}/{file} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId && isImage();
+    }
+
+    // team photo – admin and co-admin only
+    match /teams/{teamId}/{file} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && isImage()
+        && (firestore.get(/databases/(default)/documents/teams/$(teamId)).data.ownerId == request.auth.uid
+            || firestore.get(/databases/(default)/documents/teams/$(teamId)).data.get('coAdminId', null) == request.auth.uid);
+    }
+  }
+}

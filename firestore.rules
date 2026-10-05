@@ -1,0 +1,156 @@
+rules_version = '2';
+
+// Dragon Boat Runner – Firestore security rules
+//  * only team members can read team data (sessions, attendance, seating,
+//    GPS runs, member list)
+//  * only admin (owner) and co-admin can create/edit calendar entries,
+//    seating, team name/photo
+//  * max. 60 members per team
+//  * attendance can be set until 1 hour before the start; cancelling
+//    ("no") is possible until the start
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+    function teamPath(t) { return /databases/$(database)/documents/teams/$(t); }
+    function teamData(t) { return get(teamPath(t)).data; }
+    function isMember(t) { return signedIn() && me() in teamData(t).memberIds; }
+    function isManager(t) {
+      let d = teamData(t);
+      return signedIn() && me() in d.memberIds
+        && (me() == d.ownerId || me() == d.get('coAdminId', null));
+    }
+    function changedKeys() { return request.resource.data.diff(resource.data).affectedKeys(); }
+    function coAdminStillMember() {
+      return request.resource.data.get('coAdminId', null) == null
+        || request.resource.data.coAdminId in request.resource.data.memberIds;
+    }
+
+    // ------------------------------------------------------------ users
+    match /users/{userId} {
+      allow read, write: if signedIn() && me() == userId;
+    }
+
+    // ---------------------------------------------------- invite codes
+    match /codes/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      // only together with the creation of a new team by its owner
+      allow create: if signedIn()
+        && !exists(teamPath(request.resource.data.teamId))
+        && getAfter(teamPath(request.resource.data.teamId)).data.ownerId == me()
+        && getAfter(teamPath(request.resource.data.teamId)).data.code == code;
+      allow update, delete: if false;
+    }
+
+    // ------------------------------------------------------------ teams
+    match /teams/{teamId} {
+      allow get: if signedIn();
+      allow list: if false;
+
+      allow create: if signedIn()
+        && request.resource.data.ownerId == me()
+        && request.resource.data.memberIds == [me()]
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 60
+        && request.resource.data.code is string;
+
+      allow update: if
+        // admin / co-admin: name, photo, default seating
+        (isManager(teamId)
+          && changedKeys().hasOnly(['name', 'photoUrl', 'defaultLayouts']))
+        // owner: choose the co-admin ("second person") or hand over the
+        // admin role to another member
+        || (signedIn() && me() == resource.data.ownerId
+          && changedKeys().hasOnly(['coAdminId', 'ownerId'])
+          && request.resource.data.ownerId in resource.data.memberIds
+          && request.resource.data.get('coAdminId', null) != request.resource.data.ownerId
+          && coAdminStillMember())
+        // join (max. 60 members)
+        || (signedIn()
+          && changedKeys().hasOnly(['memberIds'])
+          && !(me() in resource.data.memberIds)
+          && request.resource.data.memberIds.toSet()
+               == resource.data.memberIds.toSet().union([me()].toSet())
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() + 1
+          && request.resource.data.memberIds.size() <= 60)
+        // leave (owner cannot leave)
+        || (signedIn() && me() in resource.data.memberIds
+          && me() != resource.data.ownerId
+          && changedKeys().hasOnly(['memberIds', 'coAdminId'])
+          && request.resource.data.memberIds.toSet()
+               == resource.data.memberIds.toSet().difference([me()].toSet())
+          && (!changedKeys().hasAny(['coAdminId'])
+              || resource.data.get('coAdminId', null) == me())
+          && coAdminStillMember())
+        // admin / co-admin removes one member (never the owner)
+        || (isManager(teamId)
+          && changedKeys().hasOnly(['memberIds', 'coAdminId'])
+          && resource.data.memberIds.toSet().hasAll(request.resource.data.memberIds.toSet())
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() - 1
+          && resource.data.ownerId in request.resource.data.memberIds
+          && coAdminStillMember());
+
+      allow delete: if signedIn() && me() == resource.data.ownerId;
+
+      // ------------------------------------------------- members (public profile)
+      match /members/{memberId} {
+        allow read: if isMember(teamId);
+        allow create: if signedIn() && memberId == me()
+          && me() in getAfter(teamPath(teamId)).data.memberIds;
+        allow update: if signedIn() && memberId == me() && isMember(teamId);
+        allow delete: if signedIn() && (memberId == me() || isManager(teamId));
+      }
+
+      // ------------------------------------------ trainings / races / events
+      match /sessions/{sessionId} {
+        allow read: if isMember(teamId);
+        allow create, update, delete: if isManager(teamId);
+
+        function sessionStart() {
+          return get(/databases/$(database)/documents/teams/$(teamId)/sessions/$(sessionId)).data.start;
+        }
+
+        // attendance (yes / no / maybe) + paddle side
+        match /rsvps/{memberId} {
+          allow read: if isMember(teamId);
+          allow create, update: if isManager(teamId)
+            || (signedIn() && memberId == me() && isMember(teamId)
+                && request.resource.data.get('status', 'none') in ['yes', 'no', 'maybe', 'none']
+                && (request.time < sessionStart() - duration.value(1, 'h')
+                    || (request.time < sessionStart()
+                        && request.resource.data.get('status', '') == 'no')));
+          allow delete: if isManager(teamId);
+        }
+
+        // timed GPS runs – visible to team members only
+        match /runs/{runId} {
+          allow read: if isMember(teamId);
+          allow create: if signedIn() && request.resource.data.uid == me()
+            && isMember(teamId);
+          allow delete: if signedIn()
+            && (resource.data.uid == me() || isManager(teamId));
+          allow update: if false;
+        }
+      }
+    }
+
+    // ------------------------------------------- team ranking (all sessions)
+    match /{path=**}/runs/{runId} {
+      allow read: if signedIn() && isMember(resource.data.teamId);
+    }
+
+    // --------------------------------------------------------- feedback
+    // written by the app, e-mailed by a Cloud Function, never readable
+    match /feedback/{id} {
+      allow create: if signedIn()
+        && request.resource.data.uid == me()
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 5000;
+      allow read, update, delete: if false;
+    }
+  }
+}

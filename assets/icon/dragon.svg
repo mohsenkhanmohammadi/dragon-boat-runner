@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C62828"/>
+      <stop offset="1" stop-color="#6B0F0F"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD66B"/>
+      <stop offset="1" stop-color="#E39B1B"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1F6F98"/>
+      <stop offset="1" stop-color="#0F2A3D"/>
+    </linearGradient>
+  </defs>
+
+  <g id="background">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <circle cx="512" cy="470" r="360" fill="#ffffff" opacity="0.06"/>
+  </g>
+
+  <g id="dragon">
+    <!-- mane spikes -->
+    <path d="M300 300 L230 230 L330 250 L300 170 L390 225 L395 140 L460 215 L490 150 L520 230 Z" fill="url(#gold)" stroke="#5A1A00" stroke-width="10" stroke-linejoin="round"/>
+    <!-- horn -->
+    <path d="M470 250 C520 170 600 130 690 135 C620 165 570 210 540 275 Z" fill="#FFF3D1" stroke="#5A1A00" stroke-width="10" stroke-linejoin="round"/>
+    <!-- head + neck -->
+    <path d="M380 760 C330 720 290 680 280 600 C250 470 300 300 470 250 C580 220 660 260 700 320
+             C760 330 830 360 860 410 C870 430 860 450 835 452 L700 460 C660 462 630 480 610 500
+             C560 540 500 600 480 640 C500 680 530 720 560 760 Z"
+          fill="url(#gold)" stroke="#5A1A00" stroke-width="12" stroke-linejoin="round"/>
+    <!-- nostril -->
+    <ellipse cx="800" cy="400" rx="16" ry="10" fill="#5A1A00"/>
+    <!-- lower jaw -->
+    <path d="M610 500 C650 520 700 530 790 520 C770 560 700 590 620 590 C560 590 520 600 480 640 Z"
+          fill="#F4B63A" stroke="#5A1A00" stroke-width="12" stroke-linejoin="round"/>
+    <!-- teeth -->
+    <path d="M690 458 L705 485 L720 456 Z M740 455 L752 480 L765 452 Z M650 470 L662 495 L676 466 Z" fill="#FFFFFF"/>
+    <!-- eye -->
+    <path d="M560 330 C590 305 640 310 655 340 C625 358 585 360 560 330 Z" fill="#FFFFFF" stroke="#5A1A00" stroke-width="8"/>
+    <circle cx="612" cy="336" r="15" fill="#1B1B1B"/>
+    <path d="M545 300 C590 270 650 280 680 310" fill="none" stroke="#5A1A00" stroke-width="12" stroke-linecap="round"/>
+    <!-- whisker -->
+    <path d="M820 455 C860 520 900 520 930 490" fill="none" stroke="#FFD66B" stroke-width="12" stroke-linecap="round"/>
+    <!-- scales on the neck -->
+    <path d="M360 420 q30 30 0 60 M410 380 q30 30 0 60 M380 520 q30 30 0 60 M430 470 q30 30 0 60"
+          fill="none" stroke="#B5620B" stroke-width="10" stroke-linecap="round"/>
+    <!-- water + paddle -->
+    <path d="M0 770 C60 740 120 750 120 760 C200 730 260 790 340 760 S480 730 560 760 S700 790 780 760 S880 735 920 760 S1000 770 1024 760 L1024 1024 L0 1024 Z" fill="url(#water)"/>
+    <path d="M120 820 C200 790 260 850 340 820 S480 790 560 820 S700 850 780 820 S880 795 920 820" fill="none" stroke="#7FC8F0" stroke-width="10" stroke-linecap="round" opacity="0.8"/>
+    <g transform="translate(150 20) rotate(-20 700 740)">
+      <rect x="690" y="560" width="22" height="260" rx="10" fill="#8B4513" stroke="#3B1A00" stroke-width="6"/>
+      <path d="M676 800 h50 v90 c0 25 -50 25 -50 0 Z" fill="#FFF3D1" stroke="#3B1A00" stroke-width="6"/>
+    </g>
+  </g>
+</svg>

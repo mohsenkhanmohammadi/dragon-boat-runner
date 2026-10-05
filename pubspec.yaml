@@ -1,0 +1,63 @@
+name: dragon_boat_runner
+description: Dragon Boat Runner - team app for dragon boat clubs (Android + iOS).
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  provider: ^6.1.2
+
+  # Firebase (login, database, push notifications, file storage)
+  firebase_core: ^4.1.0
+  firebase_auth: ^6.0.2
+  cloud_firestore: ^6.0.1
+  firebase_messaging: ^16.0.1
+  firebase_storage: ^13.0.1
+
+  # Maps, GPS, sensors, audio
+  google_maps_flutter: ^2.12.0
+  geolocator: ^14.0.0
+  sensors_plus: ^6.1.1
+  flutter_tts: ^4.2.0
+  audioplayers: ^6.4.0
+  wakelock_plus: ^1.2.8
+
+  # UI helpers
+  image_picker: ^1.1.2
+  shared_preferences: ^2.3.0
+  share_plus: ^11.0.0
+  app_links: ^6.4.0
+  table_calendar: ^3.2.0
+
+  # Demo mode (runs without Firebase, sample data on the phone)
+  fake_cloud_firestore: any
+  firebase_auth_mocks: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/sounds/
+
+# Run:  dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon.png"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#7F1D1D"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  min_sdk_android: 24

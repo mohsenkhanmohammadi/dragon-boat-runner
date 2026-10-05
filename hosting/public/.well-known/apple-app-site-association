@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["APPLETEAMID.de.dragonboatrunner.dragonBoatRunner"],
+        "components": [{ "/": "/join/*" }]
+      }
+    ]
+  }
+}
