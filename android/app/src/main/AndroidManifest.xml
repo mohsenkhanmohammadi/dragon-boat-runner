@@ -23,6 +23,8 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+            <!-- safer rendering on all phones (avoids black screens on some GPUs) -->
+            <meta-data android:name="io.flutter.embedding.android.EnableImpeller" android:value="false" />
             <!-- invite links are handled by the app_links package -->
             <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
 
