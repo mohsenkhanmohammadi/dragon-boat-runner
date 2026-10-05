@@ -45,7 +45,8 @@ void main() {
 }
 
 /// Initialises Firebase (or demo mode). Returns the shared preferences.
-Future<SharedPreferences> bootstrap({bool forceDemo = false}) async {
+Future<SharedPreferences> bootstrap(
+    {bool forceDemo = false, bool deepLinks = true}) async {
   await initializeDateFormatting();
 
   FirebaseOptions? options;
@@ -75,9 +76,11 @@ Future<SharedPreferences> bootstrap({bool forceDemo = false}) async {
   }
 
   final prefs = await SharedPreferences.getInstance();
-  try {
-    await DeepLinks.init();
-  } catch (_) {}
+  if (deepLinks) {
+    try {
+      await DeepLinks.init();
+    } catch (_) {}
+  }
   return prefs;
 }
 

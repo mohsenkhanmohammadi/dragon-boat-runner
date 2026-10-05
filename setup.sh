@@ -16,6 +16,7 @@ if [ -f ios/Runner.xcodeproj/project.pbxproj ]; then
   perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = \d+\.\d+;/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g' ios/Runner.xcodeproj/project.pbxproj
 fi
 
+rm -f test/widget_test.dart   # template test, replaced by test/demo_test.dart
 flutter pub get
 dart run flutter_launcher_icons
 echo "Done. Next: flutterfire configure (see README.md)"

@@ -42,7 +42,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     late SharedPreferences prefs;
     await tester.runAsync(() async {
-      prefs = await bootstrap(forceDemo: true);
+      prefs = await bootstrap(forceDemo: true, deepLinks: false);
     });
     await tester.pumpWidget(ChangeNotifierProvider(
       create: (_) => AppState(prefs),

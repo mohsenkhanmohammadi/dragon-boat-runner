@@ -24,6 +24,7 @@ if (Test-Path $pbx) {
   Set-Content -Path $pbx -Value $c -NoNewline
 }
 
+Remove-Item -ErrorAction SilentlyContinue 'test/widget_test.dart'
 Write-Host '4/5  Downloading packages...' -ForegroundColor Cyan
 flutter pub get
 
