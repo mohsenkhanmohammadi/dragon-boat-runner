@@ -32,9 +32,12 @@ jobs:
           if [ -n "$MAPS_API_KEY" ]; then
             sed -i "s/YOUR_GOOGLE_MAPS_API_KEY/$MAPS_API_KEY/" android/app/src/main/AndroidManifest.xml
           fi
-      - name: Analyze
+      - name: Analyze + tests (reports are stored on branch apk)
         continue-on-error: true
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+        run: |
+          flutter analyze --no-fatal-infos --no-fatal-warnings > analyze.txt 2>&1 || true
+          flutter test > test-report.txt 2>&1 || true
+          tail -60 test-report.txt
       - name: Build demo APK
         run: |
           flutter build apk --release --dart-define=DEMO=true
@@ -70,7 +73,7 @@ jobs:
       - name: Store APK on branch apk
         if: github.ref == 'refs/heads/main'
         run: |
-          mkdir /tmp/apk && cp DragonBoatRunner*.apk /tmp/apk/
+          mkdir /tmp/apk && cp DragonBoatRunner*.apk analyze.txt test-report.txt /tmp/apk/ 2>/dev/null || true
           cd /tmp/apk
           git init -q -b apk
           git config user.name "github-actions"

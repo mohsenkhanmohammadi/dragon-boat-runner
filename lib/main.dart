@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,8 +25,27 @@ import 'theme.dart';
 /// `flutter build apk --dart-define=DEMO=true` forces demo mode.
 const _forceDemo = bool.fromEnvironment('DEMO');
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() {
+  runZonedGuarded(() {
+    WidgetsFlutterBinding.ensureInitialized();
+    // In release builds Flutter shows an empty box for build errors –
+    // show the message instead, so problems can be reported.
+    ErrorWidget.builder = (details) => Material(
+          color: Colors.white,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Text('${details.exception}\n\n${details.stack}',
+                style: const TextStyle(color: Colors.red, fontSize: 12)),
+          ),
+        );
+    runApp(const BootApp());
+  }, (error, stack) {
+    debugPrint('Uncaught: $error\n$stack');
+  });
+}
+
+/// Initialises Firebase (or demo mode). Returns the shared preferences.
+Future<SharedPreferences> bootstrap({bool forceDemo = false}) async {
   await initializeDateFormatting();
 
   FirebaseOptions? options;
@@ -34,7 +55,7 @@ Future<void> main() async {
     options = null; // `flutterfire configure` not run yet
   }
 
-  if (options != null && !_forceDemo) {
+  if (options != null && !_forceDemo && !forceDemo) {
     await Firebase.initializeApp(options: options);
     Backend.firestore = FirebaseFirestore.instance;
     Backend.auth = FirebaseAuth.instance;
@@ -54,11 +75,70 @@ Future<void> main() async {
   }
 
   final prefs = await SharedPreferences.getInstance();
-  await DeepLinks.init();
-  runApp(ChangeNotifierProvider(
-    create: (_) => AppState(prefs),
-    child: const DragonBoatApp(),
-  ));
+  try {
+    await DeepLinks.init();
+  } catch (_) {}
+  return prefs;
+}
+
+/// Shows the dragon splash immediately, then the app – or the error text
+/// if the start fails.
+class BootApp extends StatefulWidget {
+  const BootApp({super.key});
+
+  @override
+  State<BootApp> createState() => _BootAppState();
+}
+
+class _BootAppState extends State<BootApp> {
+  late Future<SharedPreferences> _boot = bootstrap();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<SharedPreferences>(
+      future: _boot,
+      builder: (context, snap) {
+        if (snap.hasData) {
+          return ChangeNotifierProvider(
+            create: (_) => AppState(snap.data!),
+            child: const DragonBoatApp(),
+          );
+        }
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: buildTheme(),
+          home: Scaffold(
+            backgroundColor: deepWater,
+            body: Center(
+              child: snap.hasError
+                  ? SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(children: [
+                        const Icon(Icons.error_outline,
+                            color: Colors.white, size: 48),
+                        const SizedBox(height: 12),
+                        SelectableText('${snap.error}\n\n${snap.stackTrace}',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12)),
+                        const SizedBox(height: 12),
+                        FilledButton(
+                          onPressed: () =>
+                              setState(() => _boot = bootstrap()),
+                          child: const Text('Retry'),
+                        ),
+                      ]),
+                    )
+                  : Column(mainAxisSize: MainAxisSize.min, children: [
+                      Image.asset('assets/images/logo.png', width: 140),
+                      const SizedBox(height: 24),
+                      const CircularProgressIndicator(color: Colors.white),
+                    ]),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 class DragonBoatApp extends StatelessWidget {
