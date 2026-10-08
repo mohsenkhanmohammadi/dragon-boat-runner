@@ -40,8 +40,10 @@ jobs:
           tail -60 test-report.txt
       - name: Build demo APK
         run: |
-          flutter build apk --release --dart-define=DEMO=true
-          cp build/app/outputs/flutter-apk/app-release.apk DragonBoatRunner-demo.apk
+          # Demo uses fake_cloud_firestore, which refuses to run in release
+          # builds -> build the demo as a debug APK (64-bit ARM phones).
+          flutter build apk --debug --target-platform android-arm64 --dart-define=DEMO=true
+          cp build/app/outputs/flutter-apk/app-debug.apk DragonBoatRunner-demo.apk
       - name: Build Firebase APK (only if lib/firebase_options.dart is configured)
         run: |
           if grep -q "flutterfire configure" lib/firebase_options.dart; then
