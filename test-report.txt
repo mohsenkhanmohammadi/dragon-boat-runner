@@ -1,0 +1,7 @@
+
+::group::✅ Passing tests
+✅ demo data + queries + seating
+✅ app starts in demo mode
+::endgroup::
+
+🎉 2 tests passed.
