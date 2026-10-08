@@ -27,7 +27,7 @@ class _HomeShellState extends State<HomeShell> {
         children: const [
           HomeScreen(),
           CalendarScreen(),
-          LeaderboardScreen(),
+          LeaderboardScreen(timingMode: true),
           TeamScreen(),
           MoreScreen(),
         ],

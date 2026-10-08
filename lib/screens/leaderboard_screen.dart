@@ -14,7 +14,10 @@ import 'run_screen.dart';
 /// Team ranking: best time of every member per distance.
 /// Filter: all runs / only races / only trainings.
 class LeaderboardScreen extends StatefulWidget {
-  const LeaderboardScreen({super.key});
+  const LeaderboardScreen({super.key, this.timingMode = false});
+
+  /// true: the Timing tab (distance + START only, no list)
+  final bool timingMode;
 
   @override
   State<LeaderboardScreen> createState() => _LeaderboardScreenState();
@@ -105,7 +108,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(s.t('timing'))),
+      appBar: AppBar(
+          title: Text(s.t(widget.timingMode ? 'timing' : 'leaderboard'))),
       body: Column(children: [
         SizedBox(
           height: 52,
@@ -133,26 +137,57 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
-          child: SizedBox(
-            width: double.infinity,
-            height: 64,
-            child: FilledButton.icon(
-              style: FilledButton.styleFrom(
-                  textStyle: const TextStyle(
-                      fontSize: 22, fontWeight: FontWeight.w900)),
-              onPressed: _starting ? null : _start,
-              icon: const Icon(Icons.play_arrow, size: 34),
-              label: Text('START · ${formatDistance(_distance)}'),
+        if (widget.timingMode) ...[
+          Expanded(
+            child: Center(
+              child: GestureDetector(
+                onTap: _starting ? null : _start,
+                child: Container(
+                  width: 210,
+                  height: 210,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: dragonRed,
+                    boxShadow: [
+                      BoxShadow(blurRadius: 24, color: Colors.black38)
+                    ],
+                  ),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    const Text('START',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 42,
+                            fontWeight: FontWeight.w900)),
+                    Text(formatDistance(_distance),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700)),
+                  ]),
+                ),
+              ),
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-          child: Text(s.t('startHint'),
-              style: Theme.of(context).textTheme.bodySmall),
-        ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Text(s.t('startHint'),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: OutlinedButton.icon(
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const LeaderboardScreen())),
+              icon: const Icon(Icons.emoji_events),
+              label: Text(s.t('leaderboard')),
+            ),
+          ),
+        ],
+        if (!widget.timingMode) ...[
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: SegmentedButton<String>(
@@ -277,6 +312,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             },
           ),
         ),
+        ],
       ]),
     );
   }
