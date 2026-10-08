@@ -80,6 +80,18 @@ class SessionCard extends StatelessWidget {
               if (showRsvp) ...[
                 const SizedBox(height: 8),
                 RsvpBar(session: session),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => SessionDetailScreen(
+                                sessionId: session.id, initialTab: 1))),
+                    icon: const Icon(Icons.rowing, size: 20),
+                    label: Text(s.t('boatSeating')),
+                  ),
+                ),
               ],
             ],
           ),

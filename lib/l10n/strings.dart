@@ -131,7 +131,7 @@ const Map<String, Map<String, String>> _strings = {
     'deleteEntry': 'Delete entry?',
     'deleteEntryMsg': 'All members will be notified.',
     'entryDeleted': 'This entry was deleted.',
-    'overview': 'Overview', 'boat': 'Boat', 'timing': 'Timing',
+    'overview': 'Overview', 'boat': 'Boat', 'boatSeating': 'Boat seating (weight & side)', 'timing': 'Timing',
     // seating
     'drummer': 'Drummer', 'steerer': 'Steerer', 'seat': 'Seat',
     'emptySeat': 'Leave seat empty', 'attendeesN': '{n} attending',
@@ -256,7 +256,7 @@ const Map<String, Map<String, String>> _strings = {
     'deleteEntry': 'Eintrag löschen?',
     'deleteEntryMsg': 'Alle Mitglieder werden benachrichtigt.',
     'entryDeleted': 'Dieser Eintrag wurde gelöscht.',
-    'overview': 'Übersicht', 'boat': 'Boot', 'timing': 'Zeitmessung',
+    'overview': 'Übersicht', 'boat': 'Boot', 'boatSeating': 'Sitzplan im Boot (Gewicht & Seite)', 'timing': 'Zeitmessung',
     'drummer': 'Trommler', 'steerer': 'Steuer', 'seat': 'Platz',
     'emptySeat': 'Platz frei lassen', 'attendeesN': '{n} Zusagen',
     'smallBoat': 'Kleines Boot (10 + 2)', 'largeBoat': 'Großes Boot (20 + 2)',

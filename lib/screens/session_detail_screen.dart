@@ -14,8 +14,12 @@ import 'timing_tab.dart';
 /// One training / race / event with three tabs:
 /// overview + attendance, boat seating, timed runs (GPS).
 class SessionDetailScreen extends StatefulWidget {
-  const SessionDetailScreen({super.key, required this.sessionId});
+  const SessionDetailScreen(
+      {super.key, required this.sessionId, this.initialTab = 0});
   final String sessionId;
+
+  /// 0 = overview, 1 = boat seating, 2 = timing
+  final int initialTab;
 
   @override
   State<SessionDetailScreen> createState() => _SessionDetailScreenState();
@@ -51,6 +55,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
         }
         return DefaultTabController(
           length: 3,
+          initialIndex: widget.initialTab,
           child: Scaffold(
             appBar: AppBar(
               title: Text(sessionTitle(s, session)),
