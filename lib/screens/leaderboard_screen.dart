@@ -9,6 +9,7 @@ import '../theme.dart';
 import '../utils/format.dart';
 import '../widgets/avatar.dart';
 import 'run_result_screen.dart';
+import 'run_screen.dart';
 
 /// Team ranking: best time of every member per distance.
 /// Filter: all runs / only races / only trainings.
@@ -22,6 +23,72 @@ class LeaderboardScreen extends StatefulWidget {
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
   static const distances = [100.0, 200.0, 250.0, 500.0, 1000.0, 2600.0];
   double _distance = 200;
+  bool _starting = false;
+
+  bool get _isCustom => !distances.contains(_distance);
+
+  Future<void> _askCustom() async {
+    final s = S.of(context);
+    final ctrl = TextEditingController(
+        text: _isCustom ? _distance.toStringAsFixed(0) : '');
+    final v = await showDialog<double>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(s.t('customDistance')),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(suffixText: 'm'),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(c), child: Text(s.t('cancel'))),
+          FilledButton(
+            onPressed: () {
+              final d = double.tryParse(ctrl.text.replaceAll(',', '.'));
+              Navigator.pop(c, d != null && d >= 10 && d <= 50000 ? d : null);
+            },
+            child: Text(s.t('ok')),
+          ),
+        ],
+      ),
+    );
+    if (v != null) setState(() => _distance = v);
+  }
+
+  /// Start a timed run directly. It is saved with today's training/race if
+  /// one is running now, otherwise as a free training of today.
+  Future<void> _start() async {
+    final app = context.read<AppState>();
+    final team = app.team!;
+    setState(() => _starting = true);
+    final now = DateTime.now();
+    Session session = Session(
+      id: 'free-${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}',
+      type: SessionType.training,
+      start: DateTime(now.year, now.month, now.day),
+      title: '',
+    );
+    try {
+      final list = await Db.sessionsBetween(team.id,
+              now.subtract(const Duration(hours: 4)),
+              now.add(const Duration(hours: 2)))
+          .first
+          .timeout(const Duration(seconds: 5));
+      final current =
+          list.where((x) => x.type != SessionType.event).toList();
+      if (current.isNotEmpty) session = current.last;
+    } catch (_) {}
+    if (!mounted) return;
+    setState(() => _starting = false);
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (_) =>
+              RunScreen(session: session, targetMeters: _distance)),
+    );
+  }
   String _filter = 'all'; // all | race | training
   Stream<List<Run>>? _stream;
   String? _key;
@@ -38,7 +105,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(s.t('leaderboard'))),
+      appBar: AppBar(title: Text(s.t('timing'))),
       body: Column(children: [
         SizedBox(
           height: 52,
@@ -55,8 +122,36 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                     onSelected: (_) => setState(() => _distance = d),
                   ),
                 ),
+              ChoiceChip(
+                avatar: const Icon(Icons.edit, size: 16),
+                label: Text(_isCustom
+                    ? formatDistance(_distance)
+                    : s.t('custom')),
+                selected: _isCustom,
+                onSelected: (_) => _askCustom(),
+              ),
             ],
           ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+          child: SizedBox(
+            width: double.infinity,
+            height: 64,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                  textStyle: const TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.w900)),
+              onPressed: _starting ? null : _start,
+              icon: const Icon(Icons.play_arrow, size: 34),
+              label: Text('START · ${formatDistance(_distance)}'),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+          child: Text(s.t('startHint'),
+              style: Theme.of(context).textTheme.bodySmall),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),

@@ -165,6 +165,7 @@ class RunTracker extends ChangeNotifier {
 
     countdownText = 'GO!';
     _tts.speak('Go!'); // not awaited – the clock starts with "Go"
+    _player.play(AssetSource('sounds/horn.wav')); // start horn
     _sw
       ..reset()
       ..start();

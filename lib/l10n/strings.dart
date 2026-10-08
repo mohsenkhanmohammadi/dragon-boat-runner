@@ -149,7 +149,7 @@ const Map<String, Map<String, String>> _strings = {
     // timing
     'chooseDistance': 'Choose distance', 'custom': 'Custom',
     'customDistance': 'Custom distance (m)',
-    'startHint': 'After START you hear "Achtung, started" – "Are you ready?" – "Go!". The clock starts at "Go" and stops with a boat horn at the finish.',
+    'startHint': 'After START: "Achtung, started" – "Are you ready?" – "Go!" + horn. The clock (1/100 s) starts at "Go" and stops with a boat horn at the finish. Results appear in the ranking below.',
     'results': 'Results', 'onlyMine': 'Only mine',
     'noRuns': 'No timed runs yet.', 'waitingGps': 'Waiting for GPS…',
     'gpsAccuracy': 'GPS accuracy',
@@ -274,7 +274,7 @@ const Map<String, Map<String, String>> _strings = {
     'prefersLeft': 'möchte links', 'prefersRight': 'möchte rechts',
     'chooseDistance': 'Strecke wählen', 'custom': 'Eigene',
     'customDistance': 'Eigene Strecke (m)',
-    'startHint': 'Nach START hörst du „Achtung, started“ – „Are you ready?“ – „Go!“. Die Zeit läuft ab „Go“ und stoppt mit einem Schiffshorn im Ziel.',
+    'startHint': 'Nach START: „Achtung, started“ – „Are you ready?“ – „Go!“ + Horn. Die Zeit (1/100 s) läuft ab „Go“ und stoppt mit einem Schiffshorn im Ziel. Ergebnisse erscheinen unten in der Rangliste.',
     'results': 'Ergebnisse', 'onlyMine': 'Nur meine',
     'noRuns': 'Noch keine Zeitläufe.', 'waitingGps': 'Warte auf GPS…',
     'gpsAccuracy': 'GPS-Genauigkeit',
