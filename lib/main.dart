@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -41,6 +44,9 @@ void main() {
     runApp(const BootApp());
   }, (error, stack) {
     debugPrint('Uncaught: $error\n$stack');
+    if (!Backend.demo && Firebase.apps.isNotEmpty) {
+      FirebaseCrashlytics.instance.recordError(error, stack);
+    }
   });
 }
 
@@ -58,6 +64,16 @@ Future<SharedPreferences> bootstrap(
 
   if (options != null && !_forceDemo && !forceDemo) {
     await Firebase.initializeApp(options: options);
+    // Crashlytics: every error on a member's phone is reported to the
+    // Firebase console (Crashlytics), with the phone model and stack trace.
+    if (!kDebugMode) {
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
+      PlatformDispatcher.instance.onError = (error, stack) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+        return true;
+      };
+    }
     Backend.firestore = FirebaseFirestore.instance;
     Backend.auth = FirebaseAuth.instance;
   } else {

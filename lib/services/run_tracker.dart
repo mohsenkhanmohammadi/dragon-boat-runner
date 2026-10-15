@@ -242,9 +242,7 @@ class RunTracker extends ChangeNotifier {
     currentSpeed = v;
 
     if (distance + d >= targetMeters) {
-      final double frac = d > 0
-          ? ((targetMeters - distance) / d).clamp(0.0, 1.0).toDouble()
-          : 1.0;
+      final frac = finishFraction(distance, d, targetMeters);
       final crossMs = _lastMs + (dt * frac).round();
       points.add(RunPoint(
         prev.latitude + (p.latitude - prev.latitude) * frac,
@@ -275,26 +273,13 @@ class RunTracker extends ChangeNotifier {
   }
 
   void _computeStats() {
+    final r = computeRunStats(points, finalMs ?? 0, targetMeters);
+    avgSpeed = r.avg;
+    maxSpeed = r.max;
+    minSpeed = r.min;
+    maxIndex = r.maxIndex;
+    minIndex = r.minIndex;
     final ms = finalMs ?? 0;
-    avgSpeed = ms > 0 ? targetMeters / (ms / 1000) : 0;
-    if (points.length < 2) return;
-    // Min speed is measured after the start phase (once the boat is moving).
-    var startIdx = points.indexWhere((p) => p.speed >= 1.0);
-    if (startIdx < 1) startIdx = 1;
-    maxSpeed = 0;
-    minSpeed = double.infinity;
-    for (var i = 1; i < points.length; i++) {
-      final v = points[i].speed;
-      if (v > maxSpeed) {
-        maxSpeed = v;
-        maxIndex = i;
-      }
-      if (i >= startIdx && v < minSpeed) {
-        minSpeed = v;
-        minIndex = i;
-      }
-    }
-    if (minSpeed == double.infinity) minSpeed = 0;
     strokeRate = ms > 0 && _strokes.isNotEmpty
         ? _strokes.length / (ms / 60000)
         : null;
@@ -348,4 +333,36 @@ class RunTracker extends ChangeNotifier {
     _player.dispose();
     super.dispose();
   }
+}
+
+/// Where between two GPS fixes the finish line lies (0..1).
+/// [before] = distance covered before the segment, [segment] = its length.
+double finishFraction(double before, double segment, double target) =>
+    segment > 0 ? ((target - before) / segment).clamp(0.0, 1.0).toDouble() : 1.0;
+
+/// Max / min / average speed of a run. The min speed ignores the start
+/// phase (before the boat first reaches 1 m/s).
+({double avg, double max, double min, int? maxIndex, int? minIndex})
+    computeRunStats(List<RunPoint> points, int timeMs, double target) {
+  final avg = timeMs > 0 ? target / (timeMs / 1000) : 0.0;
+  if (points.length < 2) {
+    return (avg: avg, max: 0.0, min: 0.0, maxIndex: null, minIndex: null);
+  }
+  var startIdx = points.indexWhere((p) => p.speed >= 1.0);
+  if (startIdx < 1) startIdx = 1;
+  var maxV = 0.0, minV = double.infinity;
+  int? maxI, minI;
+  for (var i = 1; i < points.length; i++) {
+    final v = points[i].speed;
+    if (v > maxV) {
+      maxV = v;
+      maxI = i;
+    }
+    if (i >= startIdx && v < minV) {
+      minV = v;
+      minI = i;
+    }
+  }
+  if (minV == double.infinity) minV = 0;
+  return (avg: avg, max: maxV, min: minV, maxIndex: maxI, minIndex: minI);
 }

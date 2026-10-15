@@ -20,6 +20,7 @@ dependencies:
   cloud_firestore: ^6.0.1
   firebase_messaging: ^16.0.1
   firebase_storage: ^13.0.1
+  firebase_crashlytics: ^5.0.0   # automatic error reports from phones
 
   # Maps, GPS, sensors, audio
   google_maps_flutter: ^2.12.0
