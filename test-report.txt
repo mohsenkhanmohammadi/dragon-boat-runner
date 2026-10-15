@@ -1,0 +1,51 @@
+
+::group::✅ Passing tests
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: race time format (1/100 s) values
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: race time format (1/100 s) speed and distance
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: finish line interpolation finish in the middle of a GPS segment
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: finish line interpolation edge cases
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: run statistics average speed = distance / time
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: run statistics max speed and where
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: run statistics min speed ignores the start phase
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: run statistics too few points
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: time per 500 m
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: attendance deadline locked 1 hour before the start
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: attendance deadline open more than 1 hour before
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/timing_test.dart: attendance deadline started
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: boat size up to 12 attendees -> small boat, 13+ -> large boat
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: boat size capacities
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating 1 people: valid layout
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating 5 people: valid layout
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating 10 people: valid layout
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating 11 people: valid layout
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating 12 people: valid layout
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating 13 people: valid layout
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating 20 people: valid layout
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating 22 people: valid layout
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating 25 people: valid layout
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating 60 people: valid layout
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating paddle seats are filled before drummer and steerer
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating 11th and 12th person become drummer and steerer, 13th reserve
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating left/right balance is good for 20 random paddlers
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating side preferences are respected when possible
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating heaviest paddlers sit in the middle rows
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating people without weight are placed, but after the weighted ones
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating seats fixed by the admin are kept
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: auto seating fixed seats of people who are not coming are ignored
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/seating_test.dart: balance statistics
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/team_test.dart: create team -> unique 6 character code, creator is admin
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/team_test.dart: codes of many teams are all different
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/team_test.dart: join with code (also lower case / with spaces)
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/team_test.dart: join twice -> already member
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/team_test.dart: unknown code
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/team_test.dart: maximum 60 members
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/team_test.dart: leave team (co-admin role is removed)
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/team_test.dart: admin hands over to the co-admin -> roles swap
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/team_test.dart: admin removes a member
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/team_test.dart: attendance + paddle side, admin side is marked
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/team_test.dart: new start time resets the 3-hour reminder
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/demo_test.dart: demo data + queries + seating
+✅ /home/runner/work/dragon-boat-runner/dragon-boat-runner/test/demo_test.dart: app starts in demo mode
+::endgroup::
+
+🎉 46 tests passed.
